@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: irhesri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/18 08:12:45 by irhesri           #+#    #+#             */
-/*   Updated: 2021/12/18 08:13:29 by irhesri          ###   ########.fr       */
+/*   Created: 2021/12/18 08:07:08 by irhesri           #+#    #+#             */
+/*   Updated: 2021/12/18 08:08:24 by irhesri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static	int	ft_strcopy(char *s1, char *s2, char c)
 {

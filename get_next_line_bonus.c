@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: irhesri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/18 08:11:49 by irhesri           #+#    #+#             */
-/*   Updated: 2021/12/18 08:12:30 by irhesri          ###   ########.fr       */
+/*   Created: 2021/12/18 08:05:47 by irhesri           #+#    #+#             */
+/*   Updated: 2021/12/18 08:06:42 by irhesri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*read_next_line(char *str, int fd)
 {
@@ -40,24 +40,24 @@ char	*read_next_line(char *str, int fd)
 
 char	*get_next_line(int fd)
 {
-	static char	*str = NULL;
+	static char	*str[OPEN_MAX];
 	char		*s;
 
 	if (fd < 0 || (BUFFER_SIZE <= 0) || fd > OPEN_MAX)
 		return (NULL);
-	if (!str)
+	if (!str[fd])
 	{
-		str = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
-		if (!str)
+		str[fd] = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
+		if (!str[fd])
 			return (NULL);
-		str[0] = '\0';
+		str[fd][0] = '\0';
 	}
-	s = read_next_line(str, fd);
+	s = read_next_line(str[fd], fd);
 	if (*s == '\0')
 	{
-		free (str);
+		free (str[fd]);
 		free (s);
-		str = NULL;
+		str[fd] = NULL;
 		return (NULL);
 	}
 	return (s);
