@@ -10,30 +10,57 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <limits.h>
+#ifndef BUFFER_SIZE
+# define BUFFER_SIZE 1000
+#endif
 
-char	*read_next_line(char *str, int fd)
+static char	*ft_endlsplit(char *s1, char *s2, int *size)
+{
+	int		i;
+	int		j;
+	char	*str;
+
+	i = -1;
+	str = (char *) malloc(sizeof(char) * (*size + BUFFER_SIZE + 1));
+	if (!str)
+		return (NULL);
+	while (s1 && *s1 && s1[++i])
+		str[i] = s1[i];
+	while (s2 && s2[++i] && s2[i] != '\n')
+		str[i] = s2[i];
+	str[i] = s2[i];
+	if (str[i])
+		str[++i] = '\0';
+	(*size) = i;
+	j = -1;
+	while (s2[i])
+		s2[++j] = s2[i++];
+	s2[++j] = s2[i];
+	free (s1);
+	return (str);
+}
+
+static char	*read_next_line(char *str, int fd)
 {
 	char	*s;
 	ssize_t	len;
 	int		size;
 
 	size = 0;
-	s = NULL;
-	s = ft_endlsplit(s, str, &size);
+	s = ft_endlsplit(NULL, str, &size);
 	if (s[size - 1] == '\n')
 		return (s);
-	len = 1;
+	len = read(fd, str, BUFFER_SIZE);
 	while (len > 0)
 	{
+		str[len] = '\0';
+		s = ft_endlsplit(s, str, &size);
+		if (s[size - 1] == '\n')
+			return (s);
 		len = read(fd, str, BUFFER_SIZE);
-		if (len > 0)
-		{
-			str[len] = '\0';
-			s = ft_endlsplit(s, str, &size);
-			if (s[size - 1] == '\n')
-				return (s);
-		}
 	}
 	return (s);
 }
@@ -53,10 +80,11 @@ char	*get_next_line(int fd)
 		str[fd][0] = '\0';
 	}
 	s = read_next_line(str[fd], fd);
-	if (*s == '\0')
+	if (!s || *s == '\0')
 	{
 		free (str[fd]);
-		free (s);
+		if (s)
+			free (s);
 		str[fd] = NULL;
 		return (NULL);
 	}
