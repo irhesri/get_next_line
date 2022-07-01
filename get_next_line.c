@@ -3,79 +3,70 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: irhesri <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: irhesri <irhesri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 08:11:49 by irhesri           #+#    #+#             */
-/*   Updated: 2021/12/18 08:12:30 by irhesri          ###   ########.fr       */
+/*   Updated: 2022/07/01 23:35:25 by irhesri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static	int	ft_strcopy(char *s1, char *s2, char c)
-{
-	int	i;
-
-	i = 0;
-	while (s2[i] && (s2[i] != c))
-	{
-		s1[i] = s2[i];
-		i++;
-	}
-	if (c == '\n' && (s2[i] == '\n'))
-	{
-		s1[i] = s2[i];
-		i++;
-	}
-	s1[i] = '\0';
-	return (i);
-}
-
-char	*ft_endlsplit(char *s1, char *s2, int *size)
-{
-	int		size1;
-	int		i;
-	char	*str;
-
-	size1 = (*size) + BUFFER_SIZE + 1;
-	i = 0;
-	str = (char *) malloc(sizeof(char) * size1);
-	if (!str)
-		return (NULL);
-	if (s1 && *s1)
-		i = ft_strcopy(str, s1, '\0');
-	(*size) = i;
-	i = ft_strcopy(&str[i], s2, '\n');
-	(*size) += i;
-	ft_strcopy(s2, &s2[i], '\0');
-	free (s1);
-	return (str);
-}
-
-char	*read_next_line(char *str, int fd)
+char	*join(char *str1, char *str2, int *len)
 {
 	char	*s;
-	ssize_t	len;
-	int		size;
+	int		i;
+	int		j;
 
-	size = 0;
-	s = NULL;
-	s = ft_endlsplit(s, str, &size);
-	if (size > 0 && s[size - 1] == '\n')
-		return (s);
-	len = 1;
-	while (len > 0)
+	i = 0;
+	s = malloc(*len);
+	(*len) = 0;
+	while (str1 && str1[i])
+		s[(*len)++] = str1[i++];
+	if (str1)
+		free(str1);
+	i = 0;
+	while (str2[i] && (i == 0 || str2[i - 1] != '\n'))
+		s[(*len)++] = str2[i++];
+	if ((*len) == 0)
 	{
-		len = read(fd, str, BUFFER_SIZE);
-		if (len > 0)
+		free (s);
+		return (NULL);
+	}
+	s[(*len)] = '\0';
+	j = 0;
+	while (str2[i - 1])
+		str2[j++] = str2[i++];
+	return (s);
+}
+
+char	*read_next_line(int fd, char *str)
+{
+	int		n;
+	int		len;
+	char	*s;
+
+	s = NULL;
+	len = BUFFER_SIZE + 1;
+	while (1)
+	{
+		if (*str)
 		{
-			str[len] = '\0';
-			s = ft_endlsplit(s, str, &size);
-			if (size > 0 && s[size - 1] == '\n')
+			s = join(s, str, &len);
+			if (len > 0 && s[len - 1] == '\n')
 				return (s);
 		}
+		n = read(fd, str, BUFFER_SIZE);
+		if (!n)
+			return (s);
+		if (n < 0)
+		// {
+		// 	free (s);
+			return (NULL);
+		// }
+		str[n] = '\0';
+		len += (n + 1);
 	}
-	return (s);
 }
 
 char	*get_next_line(int fd)
@@ -92,13 +83,30 @@ char	*get_next_line(int fd)
 			return (NULL);
 		str[0] = '\0';
 	}
-	s = read_next_line(str, fd);
-	if (*s == '\0')
+	s = read_next_line(fd, str);
+	if (!*str)
 	{
 		free (str);
-		free (s);
 		str = NULL;
-		return (NULL);
 	}
 	return (s);
 }
+
+// int	main()
+// {
+// 	int		fd = open("get_next_line_bonus.h", O_RDONLY);
+// 	char	*str;
+
+// 	str = get_next_line(fd);
+// 	while (str)
+// 	{
+// 		printf("%s", str);
+// 		free (str);
+// 		str = get_next_line(fd);
+// 	}
+// // check for null
+// 	printf("%s", get_next_line(fd));
+// 	// get_next_line(fd);
+// 	// get_next_line(fd);
+
+// }
